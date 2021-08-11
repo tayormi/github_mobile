@@ -1,8 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:github_mobile/core/constants/secrets.dart';
 import 'package:github_mobile/core/constants/urls.dart';
-import 'package:github_mobile/core/models/token_model.dart';
+import 'package:github_mobile/core/models/issue_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+final apiServiceProvider = Provider<ApiService>((ref) {
+  return ApiService((ref.read));
+});
 
 final dioProvider = Provider((ref) =>
     Dio(BaseOptions(receiveTimeout: 100000, connectTimeout: 100000, headers: {
@@ -15,12 +18,11 @@ class ApiService {
 
   ApiService(this._reader);
 
-  Future<TokenModel> auth({required Secret secret}) async {
-    final url = APIUrl.accessToken;
+  Future<List<IssueModel>> getIssues() async {
+    final url = APIUrl.issues;
     try {
-      final response =
-          await _reader(dioProvider).post(url, data: secret.toJson());
-      return TokenModel.fromJson(response.data);
+      final response = await _reader(dioProvider).get(url);
+      return issueModelFromJson(response.data);
     } on DioError catch (e) {
       print(e.error);
       throw e.error;
