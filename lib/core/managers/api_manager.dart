@@ -14,8 +14,8 @@ class APIManager extends IAPIManager {
 
   APIManager(this._apiService);
   @override
-  Future<List<IssueModel>> getIssues() async {
-    final res = await _apiService.getIssues();
+  Future<List<IssueModel>> getIssues([int page = 1]) async {
+    final res = await _apiService.getIssues(page);
     return res;
   }
 }

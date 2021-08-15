@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:github_mobile/core/constants/urls.dart';
 import 'package:github_mobile/core/models/issue_model.dart';
+import 'package:github_mobile/core/models/issues_exception.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
@@ -18,14 +19,15 @@ class ApiService {
 
   ApiService(this._reader);
 
-  Future<List<IssueModel>> getIssues() async {
-    final url = APIUrl.issues;
+  Future<List<IssueModel>> getIssues([int page = 1]) async {
+    final url = APIUrl.issues + '?page=$page&per_page=100';
+
+    print("calling endpoint at $url");
     try {
       final response = await _reader(dioProvider).get(url);
       return issueModelFromJson(response.data);
     } on DioError catch (e) {
-      print(e.error);
-      throw e.error;
+      throw IssuesException.fromDioError(e);
     }
   }
 }
