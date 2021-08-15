@@ -2,7 +2,7 @@ import 'dart:ui';
 
 extension ColorExtension on String {
   toColor() {
-    var hexColor = this.replaceAll("#", "");
+    var hexColor = replaceAll("#", "");
     if (hexColor.length == 6) {
       hexColor = "FF" + hexColor;
     }
