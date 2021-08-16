@@ -39,8 +39,8 @@ class IssuesController extends StateNotifier<IssuesPagination> {
 
   void handleScrollWithIndex(int index) {
     final itemPosition = index + 1;
-    final requestMoreData = itemPosition % 20 == 0 && itemPosition != 0;
-    final pageToRequest = itemPosition ~/ 20;
+    final requestMoreData = itemPosition % 10 == 0 && itemPosition != 0;
+    final pageToRequest = itemPosition ~/ 10;
 
     if (requestMoreData && pageToRequest + 1 >= state.page) {
       print('getting more items from ${state.page}');

@@ -20,7 +20,7 @@ class ApiService {
   ApiService(this._reader);
 
   Future<List<IssueModel>> getIssues([int page = 1]) async {
-    final url = APIUrl.issues + '?page=$page&per_page=100';
+    final url = APIUrl.issues + '?page=$page&per_page=10';
 
     print("calling endpoint at $url");
     try {
