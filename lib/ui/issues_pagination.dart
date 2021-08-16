@@ -33,13 +33,13 @@ class IssuesPagination {
       'IssuesPagination(issues: $issues, page: $page, errorMessage: $errorMessage)';
 
   @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
 
-    return o is IssuesPagination &&
-        listEquals(o.issues, issues) &&
-        o.page == page &&
-        o.errorMessage == errorMessage;
+    return other is IssuesPagination &&
+        listEquals(other.issues, issues) &&
+        other.page == page &&
+        other.errorMessage == errorMessage;
   }
 
   @override
