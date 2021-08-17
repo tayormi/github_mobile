@@ -33,6 +33,8 @@ class IssuesException implements Exception {
     switch (statusCode) {
       case 400:
         return 'Bad request';
+      case 403:
+        return 'Too much API Calls. A rate limit has been applied.';
       case 404:
         return 'The requested resource was not found';
       case 500:

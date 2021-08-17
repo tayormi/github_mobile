@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:github_mobile/core/models/issue_model.dart';
 import 'package:github_mobile/core/util/text_color.dart';
 import 'package:github_mobile/extensions/color_extension.dart';
 import 'package:github_mobile/ui/issue_detail_screen.dart';
+import 'package:github_mobile/ui/theme_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:line_icons/line_icons.dart';
 
@@ -13,6 +15,8 @@ class HomeScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final filteredItem = useState('open');
+    final sortedItem = useState('created');
     final issuesController = ref.watch(issuesControllerProvider);
     return Scaffold(
         appBar: AppBar(
@@ -20,41 +24,108 @@ class HomeScreen extends HookConsumerWidget {
           centerTitle: true,
           actions: const [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Icon(Icons.sort),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Icon(Icons.filter_alt),
-            ),
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: DarkModeSwitch(),
+            )
           ],
         ),
-        body: Builder(
-          builder: (BuildContext context) {
-            if (issuesController.refreshError) {
-              return _ErrorBody(
-                  message: issuesController.errorMessage.toString());
-            } else if (issuesController.issues!.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            return RefreshIndicator(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    final issue = issuesController.issues![index];
-                    ref
-                        .read(issuesControllerProvider.notifier)
-                        .handleScrollWithIndex(index);
-                    return _IssueTile(issue: issue);
-                  },
-                  itemCount: issuesController.issues!.length,
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const Divider();
-                  },
-                ),
-                onRefresh: () =>
-                    ref.read(issuesControllerProvider.notifier).getIssues());
-          },
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Row(
+                children: [
+                  DropdownButton<String>(
+                    elevation: 16,
+                    items:
+                        <String>['open', 'closed', 'all'].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    hint: Text(filteredItem.value),
+                    onChanged: (value) {
+                      filteredItem.value = value!;
+                      ref
+                          .read(issuesControllerProvider.notifier)
+                          .filter(filter: filteredItem.value);
+                    },
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  DropdownButton<String>(
+                    elevation: 16,
+                    items: <String>['created', 'updated'].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    hint: Text(sortedItem.value),
+                    onChanged: (value) {
+                      sortedItem.value = value!;
+                      ref
+                          .read(issuesControllerProvider.notifier)
+                          .sort(sort: sortedItem.value);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Builder(
+                builder: (BuildContext context) {
+                  if (issuesController.refreshError) {
+                    return _ErrorBody(
+                        message: issuesController.errorMessage.toString());
+                  } else if (issuesController.issues!.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return RefreshIndicator(
+                      child: ListView.separated(
+                        itemBuilder: (BuildContext context, int index) {
+                          final issue = issuesController.issues![index];
+                          ref
+                              .read(issuesControllerProvider.notifier)
+                              .handleScrollWithIndex(index);
+                          return _IssueTile(issue: issue);
+                        },
+                        itemCount: issuesController.issues!.length,
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const Divider();
+                        },
+                      ),
+                      onRefresh: () {
+                        return ref
+                            .read(issuesControllerProvider.notifier)
+                            .getIssues();
+                      });
+                },
+              ),
+            ),
+          ],
         ));
+  }
+}
+
+class DarkModeSwitch extends HookConsumerWidget {
+  const DarkModeSwitch({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appThemeState = ref.watch(appThemeStateNotifier);
+    return Switch(
+      value: appThemeState.isDarkModeEnabled,
+      onChanged: (enabled) {
+        if (enabled) {
+          appThemeState.setDarkTheme();
+        } else {
+          appThemeState.setLightTheme();
+        }
+      },
+    );
   }
 }
 
