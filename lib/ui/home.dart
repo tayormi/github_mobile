@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:github_mobile/core/models/issue_model.dart';
-import 'package:github_mobile/core/util/text_color.dart';
 import 'package:github_mobile/extensions/color_extension.dart';
 import 'package:github_mobile/ui/issue_detail_screen.dart';
 import 'package:github_mobile/ui/theme_provider.dart';
@@ -9,6 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:line_icons/line_icons.dart';
 
 import 'issue_controller.dart';
+import 'util/text_color.dart';
 
 class HomeScreen extends HookConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -31,49 +31,7 @@ class HomeScreen extends HookConsumerWidget {
         ),
         body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0),
-              child: Row(
-                children: [
-                  DropdownButton<String>(
-                    elevation: 16,
-                    items:
-                        <String>['open', 'closed', 'all'].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    hint: Text(filteredItem.value),
-                    onChanged: (value) {
-                      filteredItem.value = value!;
-                      ref
-                          .read(issuesControllerProvider.notifier)
-                          .filter(filter: filteredItem.value);
-                    },
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  DropdownButton<String>(
-                    elevation: 16,
-                    items: <String>['created', 'updated'].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    hint: Text(sortedItem.value),
-                    onChanged: (value) {
-                      sortedItem.value = value!;
-                      ref
-                          .read(issuesControllerProvider.notifier)
-                          .sort(sort: sortedItem.value);
-                    },
-                  ),
-                ],
-              ),
-            ),
+            _HeaderWidget(filteredItem: filteredItem, sortedItem: sortedItem),
             Expanded(
               child: Builder(
                 builder: (BuildContext context) {
@@ -107,6 +65,63 @@ class HomeScreen extends HookConsumerWidget {
             ),
           ],
         ));
+  }
+}
+
+class _HeaderWidget extends HookConsumerWidget {
+  const _HeaderWidget({
+    Key? key,
+    required this.filteredItem,
+    required this.sortedItem,
+  }) : super(key: key);
+
+  final ValueNotifier<String> filteredItem;
+  final ValueNotifier<String> sortedItem;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+      child: Row(
+        children: [
+          DropdownButton<String>(
+            elevation: 16,
+            items: <String>['open', 'closed', 'all'].map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            hint: Text(filteredItem.value),
+            onChanged: (value) {
+              filteredItem.value = value!;
+              ref
+                  .read(issuesControllerProvider.notifier)
+                  .filter(filter: filteredItem.value);
+            },
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          DropdownButton<String>(
+            elevation: 16,
+            items: <String>['created', 'updated'].map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            hint: Text(sortedItem.value),
+            onChanged: (value) {
+              sortedItem.value = value!;
+              ref
+                  .read(issuesControllerProvider.notifier)
+                  .sort(sort: sortedItem.value);
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
 
