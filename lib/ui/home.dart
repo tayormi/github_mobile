@@ -100,7 +100,7 @@ class HomeScreen extends HookConsumerWidget {
                       onRefresh: () {
                         return ref
                             .read(issuesControllerProvider.notifier)
-                            .getIssues();
+                            .refresh();
                       });
                 },
               ),

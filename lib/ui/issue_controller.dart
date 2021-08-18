@@ -42,6 +42,17 @@ class IssuesController extends StateNotifier<IssuesPagination> {
     }
   }
 
+  Future<void> refresh() async {
+    try {
+      final issues = await _apiManager.getIssues();
+
+      state = state.copyWith(
+          issues: issues, page: 1, sort: state.sort, filter: state.filter);
+    } on IssuesException catch (e) {
+      state = state.copyWith(errorMessage: e.message);
+    }
+  }
+
   Future<void> filter({String filter = 'open'}) async {
     try {
       final issues = await _apiManager.getIssues(
