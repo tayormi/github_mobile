@@ -10,8 +10,8 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 
 final dioProvider = Provider((ref) =>
     Dio(BaseOptions(receiveTimeout: 100000, connectTimeout: 100000, headers: {
-      'Content-type': 'application/json;charset=UTF-8',
-      'Accept': 'application/json;charset=UTF-8',
+      // 'Content-type': 'application/json;charset=UTF-8',
+      'Accept': 'application/vnd.github.v3+json',
     })));
 
 class ApiService {

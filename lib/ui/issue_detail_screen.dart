@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:github_mobile/core/models/issue_model.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class IssueDetailScreen extends StatelessWidget {
   final IssueModel issue;
@@ -44,6 +45,12 @@ class IssueDetailScreen extends StatelessWidget {
                 ),
               ),
               const Divider(),
+              if (issue.createdAt != null)
+                Text(
+                  timeago.format(issue.createdAt!),
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w600),
+                ),
               Expanded(child: Markdown(data: issue.body!)),
             ],
           ),
